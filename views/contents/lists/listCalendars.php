@@ -10,7 +10,7 @@ function listCalendars() {
 
     $list = '';
 
-    if ($data === false || $data->rowCount() === 0) {
+    if (sizeof($data) == 0) {
         $list .= '<p class="msg-error">Error en la obtención de calendarios.</p>';
     } else {
         $list .= '<table class="table table-striped table-borderless">'
@@ -28,19 +28,19 @@ function listCalendars() {
                 . '</thead>'
                 . '<tbody>';
 
-        while ($row = $data->fetch()) {
+        for ($i = 0; $i < sizeof($data); $i++) {
             $list .= '<tr>'
-                    . '<td scope="row">' . $row['dia'] . '</td>'
-                    . '<td>' . $row['manana1'] . '</td>'
-                    . '<td>' . $row['manana2'] . '</td>'
-                    . '<td>' . $row['tarde1'] . '</td>'
-                    . '<td>' . $row['tarde2'] . '</td>'
-                    . '<td>' . $row['duracion_cita'] . '</td>'
-                    . '<td>' . $row['max_clientes'] . '</td>'
+                    . '<td scope="row">' . $data[$i]->getDia() . '</td>'
+                    . '<td>' . $data[$i]->getManana1() . '</td>'
+                    . '<td>' . $data[$i]->getManana2() . '</td>'
+                    . '<td>' . $data[$i]->getTarde1() . '</td>'
+                    . '<td>' . $data[$i]->getTarde2() . '</td>'
+                    . '<td>' . $data[$i]->getDuracion() . '</td>'
+                    . '<td>' . $data[$i]->getMax() . '</td>'
                     . '<td>'
                     . '<form action="?c=calendarConfig&a=action" method="post" id="formAction">'
                     . '<input type="hidden" name="js" class="js" value="0">'
-                    . '<input type="hidden" name="dia" class="dia" value="' . $row['dia'] . '">'
+                    . '<input type="hidden" name="dia" class="dia" value="' . $data[$i]->getDia() . '">'
                     . '<input type="submit" name="btnMod" class="btn btn-primary btnMod fa fa-input" value="&#xf044">'
                     . '</form>'
                     . '</td>'

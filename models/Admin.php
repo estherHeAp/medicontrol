@@ -28,7 +28,7 @@ class Admin extends Empleado {
      */
     public function create() {
         // En principio solo hay una sucursal por lo que el admin lo será de todos los empleados registrados
-        $data = parent::getEmpleados(null);
+        $data = self::getEmpleadosAll();
         $empleados = [];
         while ($row = $data->fetch()) {
             if ($row['dni'] != 'admin') {
@@ -63,6 +63,22 @@ class Admin extends Empleado {
     }
 
     // GET -------------------------------------------------------------------------------------------------------------
+    /**
+     * Obtención de los empleados guardados en la base de datos (incluyendo administradores)
+     * 
+     * @return PDOStatement - Empleados obtenidos de la base de datos
+     */
+    public function getEmpleadosAll() {
+        $sql = 'select * from empleados e, usuarios u, cuentas c '
+                . 'where e.dni = u.dni and c.usuario = u.dni '
+                . 'and e.dni in (select usuario from cuentas) '
+                . 'and e.dni <> "ADMIN";';
+
+        $param = [];
+
+        return DB::getQueryStmt($sql, $param);
+    }
+    
     // CHECK -----------------------------------------------------------------------------------------------------------
     // OTHERS ----------------------------------------------------------------------------------------------------------
 }

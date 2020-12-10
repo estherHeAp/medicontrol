@@ -107,7 +107,7 @@ class Cliente extends Usuario {
      * Obtención de las citas pendientes de cliente guardadas en la base de datos
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatemente - Citas obtenidas de la base de datos con una fecha igual o posterior a la actual
+     * @return array - Citas obtenidas de la base de datos con una fecha igual o posterior a la actual
      */
     public function getCitasPendientes() {
         $currentDate = date('Y-m-d');
@@ -122,7 +122,25 @@ class Cliente extends Usuario {
                 . 'where c.dni_cliente = ? and fecha >= ? order by fecha, hora;';
         $param = [$this->dni, $currentDate];
 
-        return DB::getQueryStmt($sql, $param);
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $citas = [];
+            
+            while($row = $stmt->fetch()) {
+                $cita = new Cita();
+                $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
+                
+                // Se desean añadir los nombres del cliente y el empleado
+                array_push($citas, $cita, 
+                        $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'],
+                        $row['nombre_empleado'] . ' ' . $row['apellido1_empleado']);
+            }
+            
+            return $citas;
+        } else {
+            return false;
+        }
     }
 
     /**

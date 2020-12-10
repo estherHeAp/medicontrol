@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Especialidad
+ * Clase para la gestión de especialidades
  *
  * @author Esther
  */
@@ -27,6 +27,11 @@ class Especialidad {
 
     // Métodos =========================================================================================================
     // CREATE, UPDATE, DELETE ------------------------------------------------------------------------------------------
+    /**
+     * Adición de una nueva especialidad
+     * 
+     * @return boolean - Creación con éxito (true) o no (false)
+     */
     public function create() {
         $sql = 'insert into especialidades (nombre) values (?);';
         $param = [$this->nombre];
@@ -34,6 +39,11 @@ class Especialidad {
         return DB::getQueryStmt($sql, $param);
     }
     
+    /**
+     * Eliminación de una especialidad
+     * 
+     * @return boolean - Creación con éxito (true) o no (false)
+     */
     public function delete() {
         $sql = 'delete from especialidades where nombre = ?;';
         $param = [$this->nombre];

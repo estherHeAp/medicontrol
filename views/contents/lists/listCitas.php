@@ -23,7 +23,7 @@ function listCitas($usuario, $search, $all) {
 
     if ($data === false) {
         $list .= '<p class="msg-error">Error en la obtención de citas.</p>';
-    } elseif ($data->rowCount() === 0) {
+    } elseif (sizeof($data) == 0) {
         if (isset($search)) {
             $list .= '<p class="msg-info">No se han encontrado resultados</p>';
         } else {
@@ -45,20 +45,20 @@ function listCitas($usuario, $search, $all) {
                 . '</thead>'
                 . '<tbody>';
 
-        while ($row = $data->fetch()) {
+        for($i = 0; $i < sizeof($data); $i += 3) {
             $list .= '<tr>'
-                    . '<td scope="row">' . $row['fecha'] . '</td>'
-                    . '<td>' . $row['hora'] . '</td>'
-                    . '<td>' . $row['asunto'] . '</td>';
+                    . '<td scope="row">' . $data[$i]->getFecha() . '</td>'
+                    . '<td>' . $data[$i]->getHora() . '</td>'
+                    . '<td>' . $data[$i]->getAsunto() . '</td>';
             if ($usuario instanceof Empleado) {
-                $list .= '<td>' . $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'] . '</td>';
+                $list .= '<td>' . $data[$i+1] . '</td>';
             }
-            $list .= '<td>' . $row['nombre_empleado'] . ' ' . $row['apellido1_empleado'] . '</td>'
+            $list .= '<td>' . $data[$i+2] . '</td>'
                     . '<td>'
                     . '<form action="?c=citas&a=action" method="post" id="formAction">'
                     . '<input type="hidden" name="js" class="js" value="0">'
                     . '<input type="hidden" name="all" id="all" value="' . $all . '">'
-                    . '<input type="hidden" name="idCita" class="idCita" value="' . $row['id'] . '">'
+                    . '<input type="hidden" name="idCita" class="idCita" value="' . $data[$i]->getId() . '">'
                     . '<input type="submit" name="btnMod" class="btn btn-primary btnMod fa fa-input" value="&#xf044">'
                     . '<input type="submit" name="btnDel" class="btn btn-danger btnDel fa fa-input" value="&#xf2ed">'
                     . '</form>'

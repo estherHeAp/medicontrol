@@ -188,7 +188,7 @@ class Empleado extends Usuario {
      * Obtención de todas las citas guardadas en la base de datos (todas o las que correspondan a un criterio de búsqueda dado)
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Citas obtenidas de la base de datos
+     * @return array - Citas obtenidas de la base de datos
      */
     public function getCitas($search) {
         $dni = $search !== null ? $search['dni'] : '';
@@ -204,8 +204,26 @@ class Empleado extends Usuario {
                 . 'where cl.dni like ? and c.asunto like ? '
                 . 'order by fecha, hora;';
         $param = ["%$dni%", "%$asunto%"];
-
-        return DB::getQueryStmt($sql, $param);
+        
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $citas = [];
+            
+            while($row = $stmt->fetch()) {
+                $cita = new Cita();
+                $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
+                
+                // Se desean añadir los nombres del cliente y el empleado
+                array_push($citas, $cita, 
+                        $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'],
+                        $row['nombre_empleado'] . ' ' . $row['apellido1_empleado']);
+            }
+            
+            return $citas;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -230,7 +248,7 @@ class Empleado extends Usuario {
      * Obtención de las citas pendientes guardadas en la base de datos (todas o las que correspondan a un criterio de búsqueda dado)
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatemente - Citas obtenidas de la base de datos con una fecha igual o posterior a la actual
+     * @return array - Citas obtenidas de la base de datos con una fecha igual o posterior a la actual
      */
     public function getCitasPendientes($search) {
         $currentDate = date('Y-m-d');
@@ -249,7 +267,25 @@ class Empleado extends Usuario {
                 . 'order by fecha, hora;';
         $param = [$currentDate, "%$dni%", "%$asunto%"];
 
-        return DB::getQueryStmt($sql, $param);
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $citas = [];
+            
+            while($row = $stmt->fetch()) {
+                $cita = new Cita();
+                $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
+                
+                // Se desean añadir los nombres del cliente y el empleado
+                array_push($citas, $cita, 
+                        $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'],
+                        $row['nombre_empleado'] . ' ' . $row['apellido1_empleado']);
+            }
+            
+            return $citas;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -21,6 +21,7 @@ class Laboral extends Calendario {
     }
 
     // Setters ---------------------------------------------------------------------------------------------------------
+
     /**
      * Función que actúa como constructor de la clase con todos sus atributos como parámetros
      * 
@@ -44,6 +45,7 @@ class Laboral extends Calendario {
 
     // Métodos =========================================================================================================
     // CREATE, UPDATE, DELETE ------------------------------------------------------------------------------------------
+
     /**
      * Actualización de los datos del calendario
      * 
@@ -54,36 +56,60 @@ class Laboral extends Calendario {
         // Si no existen, los creamos y utilizamos los nuevos ids
         $idDisponibilidad = parent::getIdDisponibilidad();
         $idHorarios = parent::getIdHorarios();
-        
+
         $sql = 'update fechas set id_disponibilidad = ?, id_horarios = ? where tipo = "L" and dia = ?';
         $param = [$idDisponibilidad, $idHorarios, $this->dia];
-        
+
         return DB::getQueryStmt($sql, $param);
     }
 
     // GET -------------------------------------------------------------------------------------------------------------
+
     /**
      * Obtención de los calendarios
      * 
-     * @return PDOStatement - Calendarios obtenidos de la base de datos
+     * @return array - Calendarios obtenidos de la base de datos
      */
     public static function getLaborales() {
         $sql = 'select * from fechas f, disponibilidad d, horarios h where f.id_disponibilidad = d.id and f.id_horarios = h.id and f.tipo = "L" order by dia;';
         $param = [];
 
-        return DB::getQueryStmt($sql, $param);
+        $stmt = DB::getQueryStmt($sql, $param);
+
+        $laborales = [];
+
+        if ($stmt) {
+            while ($row = $stmt->fetch()) {
+                $laboral = new Laboral();
+                $laboral->set($row['manana1'], $row['manana2'], $row['tarde1'], $row['tarde2'], $row['duracion_cita'], $row['max_clientes'], $row['dia'], null);
+                array_push($laborales, $laboral);
+            }
+        }
+
+        return $laborales;
     }
 
     /**
      * Obtención de los datos para un día dado
      * 
-     * @return PDOStatement - Día obtenido de la base de datos
+     * @return Laboral - Día obtenido de la base de datos
      */
     public function getByDia() {
         $sql = 'select * from fechas f, disponibilidad d, horarios h where f.id_disponibilidad = d.id and f.id_horarios = h.id and f.tipo = "L" and f.dia = ?;';
         $param = [$this->dia];
 
-        return DB::getQueryStmt($sql, $param);
+        $stmt = DB::getQueryStmt($sql, $param);
+
+        $dia = null;
+
+        if ($stmt) {
+            $row = $stmt->fetch();
+            
+            $dia = new Laboral();
+            $dia->set($row['manana1'], $row['manana2'], $row['tarde1'], $row['tarde2'], $row['duracion_cita'], $row['max_clientes'], $row['dia'], null);
+        }
+
+        return $dia;
     }
 
     // CHECK -----------------------------------------------------------------------------------------------------------
