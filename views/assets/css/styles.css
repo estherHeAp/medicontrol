@@ -1,0 +1,90 @@
+/* MENSAJES ********************************************************************************************************* */
+#msg {margin: 0 5% !important; padding: 0 15px !important;}
+
+div:not([class*="table"]) > p[class*="msg-"] {margin: 25px 0 -3rem !important; padding-right: 0 !important; padding-left: 0 !important;}
+
+.msg-info {color: #666666;}
+
+.msg-error {color: #EE0000;}
+
+.msg-conf {color: #009900;}
+
+/* TABLAS *********************************************************************************************************** */
+section:not(#page-citas) table {margin-top: 3rem;}
+
+.table td, .table th {vertical-align: middle !important;}
+
+.table form input {margin: .25rem !important;}
+
+/* CALENDARIOS ****************************************************************************************************** */
+.calendar {
+    display: inline-table;
+    width: 100%;
+    max-width: 350px;
+    margin-bottom: 1rem !important;
+}
+.dia:not(.disabled) {cursor: pointer;}
+
+.disabled {
+    background-color: #CCC;
+    color: #666;
+}
+
+/* FORMULARIOS ****************************************************************************************************** */
+
+.row {margin-right: 0px !important; margin-left: 0px !important;}
+section > form, #page-login form, #divUpdate form {margin-top: 3rem;}
+.form-row > div:last-child {margin: 1.5rem 0 .75rem;}
+.btn {margin-bottom: .25rem !important;}
+
+legend {font-size: 22px;}
+
+.btn-primary {
+    background-color: #0055FF;
+    border-color: #0055FF;
+}
+
+.btn-primary:hover {
+    background-color: #0055FF;
+    border-color: #0055FF;
+}
+
+.btn-secondary {
+    background-color: #666;
+    border-color: #666;
+}
+
+.btn-secondary:hover {
+    background-color: #666;
+    border-color: #666;
+}
+
+.btn-danger {
+    background-color: #EE0000;
+    border-color: #EE0000;
+}
+
+.btn-danger:hover {
+    background-color: #EE0000;
+    border-color: #EE0000;
+}
+
+.btn-warning {
+    background-color: #FF9900;
+    border-color: #FF9900;
+}
+
+.btn-warning:hover {
+    background-color: #FF9900;
+    border-color: #FF9900;
+}
+
+.btn-info {
+    background-color: #993300;
+    border-color: #993300;
+}
+
+.btn-info:hover {
+    background-color: #993300;
+    border-color: #993300;
+}
