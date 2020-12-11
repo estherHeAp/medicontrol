@@ -13,7 +13,7 @@ function listEspecialidades($usuario) {
 
     if ($data === false) {
         $list .= '<p class="msg-error">Error en la obtención de especialidades.</p>';
-    } elseif ($data->rowCount() === 0) {
+    } elseif (sizeof($data) == 0) {
         $list .= '<p class="msg-info">No hay especialidades registradas</p>';
     } else {
         $list .= '<table class="table table-striped table-borderless">'
@@ -25,13 +25,13 @@ function listEspecialidades($usuario) {
                 . '</thead>'
                 . '<tbody>';
 
-        while ($row = $data->fetch()) {
+        for($i = 0; $i < sizeof($data); $i++) {
             $list .= '<tr>'
-                    . '<td>' . $row['nombre'] . '</td>'
+                    . '<td>' . $data[$i]->getNombre() . '</td>'
                     . '<td>'
                     . '<form action="?c=especialidades&a=delete" method="post" id="formDelete">'
                     . '<input type="hidden" name="js" class="js" value="0">'
-                    . '<input type="hidden" name="especialidad" class="especialidad" value="' . $row['nombre'] . '">'
+                    . '<input type="hidden" name="especialidad" class="especialidad" value="' . $data[$i]->getNombre() . '">'
                     . '<input type="submit" name="btnDel" class="btn btn-danger btnDel fa fa-input" value="&#xf2ed">'
                     . '</form>'
                     . '</td>'

@@ -182,7 +182,7 @@ class ClientesController {
         $cliente->setDni($dniCliente);
         $consultas = $cliente->getConsultas(null);
 
-        if ($consultas->rowCount() > 0) {
+        if (sizeof($consultas) > 0) {
             $msg['msg']['error'] = 'El usuario dispone de consultas asociadas que no pueden ser eliminadas.';
         } else {
             // Eliminamos el cliente

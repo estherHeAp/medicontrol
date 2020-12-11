@@ -147,7 +147,7 @@ class Cliente extends Usuario {
      * Obtención de todas las consultas del cliente guardadas en la base de datos (todas o las que correspondan a un criterio de búsqueda dado)
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Consultas obtenidas de la base de datos
+     * @return array - Consultas obtenidas de la base de datos
      */
     public function getConsultas($search) {
         $asunto = $search !== null ? $search['asunto'] : '';
@@ -167,7 +167,27 @@ class Cliente extends Usuario {
                 . 'order by fecha desc, hora desc';
         $param = [$this->dni, "%$asunto%", "%$pago%"];
 
-        return DB::getQueryStmt($sql, $param);
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $consultas = [];
+            
+            while($row = $stmt->fetch()) {
+                $consulta = new Consulta();
+                $consulta->set($row['consulta'], $row['id'], $row['descripcion'], $row['pruebas'], $row['pruebas_detalles'], $row['tratamientos'], $row['tratamientos_detalles'], $row['otros_detalles'], $row['importe'], $row['pago']);
+                
+                $cita = new Cita();
+                $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
+                
+                // Se mostrará información de la cita, la consulta y los nombres de los clientes y los empleados encargados
+                array_push($consultas,
+                        array($consulta, $cita, $row['nombre_cliente'].' '.$row['apellido1_cliente'], $row['nombre_empleado'].' '.$row['apellido1_empleado']));
+            }
+            
+            return $consultas;
+        } else {
+            return false;
+        }
     }
 
     // CHECK -----------------------------------------------------------------------------------------------------------

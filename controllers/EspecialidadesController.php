@@ -34,6 +34,7 @@ class EspecialidadesController {
 
         // Datos obligatorios
         if (isset($nombre)) {
+            // ¿Existe ya la especialidad?
             if (!$usuario->getEspecialidadByNombre($nombre)) {
                 $especialidad = new Especialidad();
                 $especialidad->setNombre($nombre);

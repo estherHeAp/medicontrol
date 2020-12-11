@@ -215,7 +215,8 @@ class Empleado extends Usuario {
                 $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
                 
                 // Se desean añadir los nombres del cliente y el empleado
-                array_push($citas, $cita, 
+                array_push($citas, 
+                        $cita, 
                         $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'],
                         $row['nombre_empleado'] . ' ' . $row['apellido1_empleado']);
             }
@@ -229,10 +230,10 @@ class Empleado extends Usuario {
     /**
      * Obtención de las citas guardadas en la base de datos que no constan de una consuta relacionada
      * 
-     * @return PDOStatement - Citas obtenidas de la base de datos sin consultas relacionadas
+     * @return array - Citas obtenidas de la base de datos sin consultas relacionadas
      */
     public function getCitasNoConsulta() {
-        $sql = 'select c.id, c.fecha, c.hora, c.asunto, uc.nombre nombre_cliente, uc.apellido1 apellido1_cliente '
+        $sql = 'select c.id, c.fecha, c.hora, c.asunto, c.dni_cliente, c.dni_empleado, uc.nombre nombre_cliente, uc.apellido1 apellido1_cliente '
                 . 'from citas c '
                 . 'left join clientes cl on cl.dni = c.dni_cliente '
                 . 'left join usuarios uc on uc.dni = cl.dni '
@@ -240,8 +241,23 @@ class Empleado extends Usuario {
                 . 'where c.id not in(select id_cita from consultas) '
                 . 'order by fecha, hora;';
         $param = [];
+        
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        $citas = [];
+        if($stmt) {
+            while($row = $stmt->fetch()) {
+                $cita = new Cita();
+                $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
+                
+                // Se desea añadir el nombre del cliente
+                array_push($citas,
+                        $cita,
+                        $row['nombre_cliente'] . ' ' . $row['apellido1_cliente']);
+            }
+        }
 
-        return DB::getQueryStmt($sql, $param);
+        return $citas;
     }
 
     /**
@@ -277,7 +293,8 @@ class Empleado extends Usuario {
                 $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
                 
                 // Se desean añadir los nombres del cliente y el empleado
-                array_push($citas, $cita, 
+                array_push($citas, 
+                        $cita, 
                         $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'],
                         $row['nombre_empleado'] . ' ' . $row['apellido1_empleado']);
             }
@@ -292,7 +309,7 @@ class Empleado extends Usuario {
      * Obtención de todas las consultas guardadas en la base de datos (todas o las que correspondan a un criterio de búsqueda dado)
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Consultas obtenidas de la base de datos
+     * @return array - Consultas obtenidas de la base de datos
      */
     public function getConsultas($search) {
         $dni = $search !== null ? $search['dni'] : '';
@@ -311,23 +328,57 @@ class Empleado extends Usuario {
                 . 'where cl.dni like ? and c.asunto like ? and co.pago like ? '
                 . 'order by fecha desc, hora desc;';
         $param = ["%$dni%", "%$asunto%", "%$pago%"];
-
-        return DB::getQueryStmt($sql, $param);
+        
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $consultas = [];
+            
+            while($row = $stmt->fetch()) {
+                $consulta = new Consulta();
+                $consulta->set($row['consulta'], $row['id'], $row['descripcion'], $row['pruebas'], $row['pruebas_detalles'], $row['tratamientos'], $row['tratamientos_detalles'], $row['otros_detalles'], $row['importe'], $row['pago']);
+                
+                $cita = new Cita();
+                $cita->set($row['id'], $row['dni_cliente'], $row['dni_empleado'], $row['fecha'], $row['hora'], $row['asunto']);
+                
+                // Se mostrará información de la cita, la consulta y los nombres de los clientes y los empleados encargados
+                array_push($consultas,
+                        array($consulta, $cita, $row['nombre_cliente'].' '.$row['apellido1_cliente'], $row['nombre_empleado'].' '.$row['apellido1_empleado']));
+            }
+            
+            return $consultas;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Obtención de los clientes guardados en la base de datos (todos o los que correspondan a un criterio de búsqueda dado)
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Clientes obtenidos de la base de datos
+     * @return array - Clientes obtenidos de la base de datos
      */
     public function getClientes($search) {
         $dni = is_array($search) ? $search['dni'] : '';
 
         $sql = 'select * from clientes c, usuarios u where c.dni = u.dni and c.dni like ?;';
         $param = ["%$dni%"];
-
-        return DB::getQueryStmt($sql, $param);
+        
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $clientes = [];
+            
+            while($row = $stmt->fetch()) {
+                $cliente = new Cliente();
+                $cliente->set($row['dni'], $row['nombre'], $row['apellido1'], $row['apellido2'], $row['sexo'], $row['fecha_nacimiento'], $row['email'], $row['telf'], $row['aseguradora'], null, null, null, null);
+                array_push($clientes, $cliente);
+            }
+            
+            return $clientes;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -336,7 +387,7 @@ class Empleado extends Usuario {
      * Si nos encontramos en la página de administradores, para añadir empleados como administradores, excluimos a éstos de los resultados obtenidos
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Empleados obtenidos de la base de datos
+     * @return array - Empleados obtenidos de la base de datos
      */
     public function getEmpleados($search) {
         $c = filterGet('c');
@@ -356,15 +407,29 @@ class Empleado extends Usuario {
         }
 
         $param = ["%$dni%", "%$nombre%", "%$especialidad%"];
-
-        return DB::getQueryStmt($sql, $param);
+        
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $empleados = [];
+            
+            while($row = $stmt->fetch()) {
+                $empleado = new Empleado();
+                $empleado->set($row['dni'], $row['nombre'], $row['apellido1'], $row['apellido2'], $row['sexo'], $row['fecha_nacimiento'], $row['email'], $row['telf'], null, $row['fecha_alta'], $row['fecha_baja'], $row['especialidad'], $row['extension']);
+                array_push($empleados, $empleado);
+            }
+            
+            return $empleados;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Obtención de los administradores guardados en la base de datos con excepción del usuario ADMIN (todos o los que correspondan a un criterio de búsqueda dado)
      * 
      * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Administradores obtenidos de la base de datos
+     * @return array - Administradores obtenidos de la base de datos
      */
     public function getAdmin($search) {
         $nombre = is_array($search) ? $search['nombre'] : '';
@@ -376,8 +441,22 @@ class Empleado extends Usuario {
                 . 'and nombre like ? and especialidad like ? '
                 . 'group by a.dni_admin;';
         $param = ["%$nombre%", "%$especialidad%"];
-
-        return DB::getQueryStmt($sql, $param);
+        
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $empleados = [];
+            
+            while($row = $stmt->fetch()) {
+                $empleado = new Empleado();
+                $empleado->set($row['dni'], $row['nombre'], $row['apellido1'], $row['apellido2'], $row['sexo'], $row['fecha_nacimiento'], $row['email'], $row['telf'], null, $row['fecha_alta'], $row['fecha_baja'], $row['especialidad'], $row['extension']);
+                array_push($empleados, $empleado);
+            }
+            
+            return $empleados;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -390,14 +469,28 @@ class Empleado extends Usuario {
         $sql = 'select * from especialidades where nombre <> "ROOT";';
         $param = [];
 
-        return DB::getQueryStmt($sql, $param);
+        $stmt = DB::getQueryStmt($sql, $param);
+        
+        if($stmt) {
+            $especialidades = [];
+            
+            while($row = $stmt->fetch()) {
+                $especialidad = new Especialidad();
+                $especialidad->setNombre($row['nombre']);
+                array_push($especialidades, $especialidad);
+            }
+            
+            return $especialidades;
+        } else {
+            return false;
+        }
     }
 
     /**
-     * Obtención de las especialidades guardadas en la base de datos (todas o las que correspondan a un criterio de búsqueda dado)
+     * Comprobación de la existencia de una especialidad
      * 
-     * @param array $search - Parámetros de búsqueda
-     * @return PDOStatement - Especialidades obtenidas de la base de datos
+     * @param array $nombre - Nombre de la especialidad
+     * @return boolean - Especialidad ya registrada (true) o no (false)
      */
     public function getEspecialidadByNombre($nombre) {
         $sql = 'select * from especialidades where nombre = ?;';

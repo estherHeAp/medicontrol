@@ -13,12 +13,12 @@ function selectClientes($usuario, $cliente) {
     $select = '<label for="clienteSelect">Cliente:</label>'
             . '<select name="clienteSelect" class="clienteSelect form-control">'
             . '<option value=""></option>';
-    while ($row = $data->fetch()) {
-        $select .= '<option value="' . $row['dni'] . '"';
-        if ($row['dni'] == $cliente) {
+    for($i = 0; $i < sizeof($data); $i++) {
+        $select .= '<option value="' . $data[$i]->getDni() . '"';
+        if ($data[$i]->getDni() == $cliente) {
             $select .= ' selected';
         }
-        $select .= '>' . $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'] . '</option>';
+        $select .= '>' . $data[$i]->getNombre() . ' ' . $data[$i]->getApellido1() . ' ' . $data[$i]->getApellido2() . '</option>';
     }
     $select .= '</select>';
 

@@ -153,7 +153,7 @@ class PerfilController {
                 // No se puede eliminar un cliente con consultas asociadas
                 $consultas = $usuario->getConsultas(null);
 
-                if ($consultas->rowCount() > 0) {
+                if (sizeof($consultas) > 0) {
                     $msg['msg']['error'] = 'El usuario dispone de consultas asociadas que no pueden ser eliminadas.';
                 } else {
                     // Eliminamos el usuario

@@ -14,7 +14,7 @@ function listAdmin($usuario, $search) {
 
     if ($data === false) {
         $list .= '<p class="msg-error">Error en la obtención de administradores.</p>';
-    } elseif ($data->rowCount() === 0) {
+    } elseif (sizeof($data) == 0) {
         if (isset($search)) {
             $list .= '<p class="msg-info">No se han encontrado resultados</p>';
         } else {
@@ -47,41 +47,41 @@ function listAdmin($usuario, $search) {
                 . '</thead>'
                 . '<tbody>';
 
-        while ($row = $data->fetch()) {
+        for($i = 0; $i < sizeof($data); $i++) {
             if (!isset($_SESSION['dni'])) {
-                $_SESSION['dni'] = $row['dni'];
+                $_SESSION['dni'] = $data[$i]->getDni();
             }
             
             $list .= '<tr>';
             if ($usuario instanceof Admin) {
-                $list .= '<td scope="row">' . $row['dni'] . '</td>';
+                $list .= '<td scope="row">' . $data[$i]->getDni() . '</td>';
             }
-            $list .= '<td>' . $row['nombre'] . '</td>'
-                    . '<td>' . $row['apellido1'] . '</td>'
-                    . '<td>' . $row['apellido2'] . '</td>';
+            $list .= '<td>' . $data[$i]->getNombre() . '</td>'
+                    . '<td>' . $data[$i]->getApellido1() . '</td>'
+                    . '<td>' . $data[$i]->getApellido2() . '</td>';
             if ($usuario instanceof Admin) {
-                $list .= '<td>' . $row['sexo'] . '</td>'
+                $list .= '<td>' . $data[$i]->getSexo() . '</td>'
                         . '<td>';
-                if ($row['fecha_nacimiento'] != '0000-00-00') {
-                    $list .= $row['fecha_nacimiento'];
+                if ($data[$i]->getFechaNacimiento() != '0000-00-00') {
+                    $list .= $data[$i]->getFechaNacimiento();
                 }
                 $list .= '</td>'
-                        . '<td>' . $row['email'] . '</td>'
+                        . '<td>' . $data[$i]->getEmail() . '</td>'
                         . '<td>';
-                if ($row['telf'] != '0') {
-                    $list .= $row['telf'];
+                if ($data[$i]->getTelf() != '0') {
+                    $list .= $data[$i]->getTelf();
                 }
                 $list .= '</td>'
-                        . '<td>' . $row['fecha_alta'] . '</td>'
-                        . '<td>' . $row['fecha_baja'] . '</td>';
+                        . '<td>' . $data[$i]->getFechaAlta() . '</td>'
+                        . '<td>' . $data[$i]->getFechaBaja() . '</td>';
             }
-            $list .= '<td>' . $row['especialidad'] . '</td>'
-                    . '<td>' . $row['extension'] . '</td>';
+            $list .= '<td>' . $data[$i]->getEspecialidad() . '</td>'
+                    . '<td>' . $data[$i]->getExtension() . '</td>';
             if ($usuario instanceof Admin) {
                 $list .= '<td>'
                         . '<form action="?c=admin&a=action" method="post" id="formAction">'
                         . '<input type="hidden" name="js" class="js" value="0">'
-                        . '<input type="hidden" name="dniAdmin" class="dniAdmin" value="' . $row['dni'] . '">'
+                        . '<input type="hidden" name="dniAdmin" class="dniAdmin" value="' . $data[$i]->getDni() . '">'
                         . '<input type="submit" name="btnMod" class="btn btn-primary btnMod fa fa-input" value="&#xf044">'
                         . '<input type="submit" name="btnDel" class="btn btn-danger btnDel fa fa-input" value="&#xf2ed">'
                         . '<input type="submit" name="btnRes" class="btn btn-warning btnRes fa fa-input" value="&#xf2ea">'

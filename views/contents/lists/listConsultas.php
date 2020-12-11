@@ -8,6 +8,7 @@
  * @return string
  */
 function listConsultas($usuario, $search) {
+    // Se utilizan los datos relativos a la consulta, la cita, el cliente y el empleado a través de un array multidimensional con los datos en este orden
     if ($usuario instanceof Cliente) {
         $data = $usuario->getConsultas($search);
     } elseif ($usuario instanceof Empleado) {
@@ -18,7 +19,7 @@ function listConsultas($usuario, $search) {
 
     if ($data === false) {
         $list .= '<p class="msg-error">Error en la obtención de consultas.</p>';
-    } elseif ($data->rowCount() === 0) {
+    } elseif (sizeof($data) == 0) {
         if (isset($search)) {
             $list .= '<p class="msg-info">No se han encontrado resultados</p>';
         } else {
@@ -54,46 +55,46 @@ function listConsultas($usuario, $search) {
                 . '</thead>'
                 . '<tbody>';
 
-        while ($row = $data->fetch()) {
+        for($i = 0; $i < sizeof($data); $i++) {
             $list .= '<tr>'
-                    . '<td scope="row">' . $row['fecha'] . '</td>'
-                    . '<td>' . $row['hora'] . '</td>'
-                    . '<td>' . $row['asunto'] . '</td>'
-                    . '<td>' . $row['descripcion'] . '</td>'
+                    . '<td scope="row">' . $data[$i][1]->getFecha() . '</td>'
+                    . '<td>' . $data[$i][1]->getHora() . '</td>'
+                    . '<td>' . $data[$i][1]->getAsunto() . '</td>'
+                    . '<td>' . $data[$i][0]->getDescripcion() . '</td>'
                     . '<td>';
-            if ($row['pruebas'] == 0 || $row['pruebas'] == null) {
+            if ($data[$i][0]->getPruebas() == 0 || $data[$i][0]->getPruebas() == null) {
                 $list .= 'N';
-            } elseif ($row['pruebas'] == 1) {
+            } elseif ($data[$i][0]->getPruebas() == 1) {
                 $list .= 'S';
             }
             $list .= '</td>'
-                    . '<td>' . $row['pruebas_detalles'] . '</td>'
+                    . '<td>' . $data[$i][0]->getPruebasDet() . '</td>'
                     . '<td>';
-            if ($row['tratamientos'] == 0 || $row['tratamientos'] == null) {
+            if ($data[$i][0]->getTratamientos() == 0 || $data[$i][0]->getTratamientos() == null) {
                 $list .= 'N';
-            } elseif ($row['tratamientos'] == 1) {
+            } elseif ($data[$i][0]->getTratamientos() == 1) {
                 $list .= 'S';
             }
             $list .= '</td>'
-                    . '<td>' . $row['tratamientos_detalles'] . '</td>'
-                    . '<td>' . $row['otros_detalles'] . '</td>'
-                    . '<td>' . $row['importe'] . '</td>'
+                    . '<td>' . $data[$i][0]->getTratamientosDet() . '</td>'
+                    . '<td>' . $data[$i][0]->getOtros() . '</td>'
+                    . '<td>' . $data[$i][0]->getImporte() . '</td>'
                     . '<td>';
-            if ($row['pago'] == 0 || $row['pago'] == null) {
+            if ($data[$i][0]->getPago() == 0 || $data[$i][0]->getPago() == null) {
                 $list .= 'N';
-            } elseif ($row['pago'] == 1) {
+            } elseif ($data[$i][0]->getPago() == 1) {
                 $list .= 'S';
             }
             $list .= '</td>';
             if ($usuario instanceof Empleado) {
-                $list .= '<td>' . $row['nombre_cliente'] . ' ' . $row['apellido1_cliente'] . '</td>';
+                $list .= '<td>' . $data[$i][2] . '</td>';
             }
-            $list .= '<td>' . $row['nombre_empleado'] . ' ' . $row['apellido1_empleado'] . '</td>';
+            $list .= '<td>' . $data[$i][3] . '</td>';
             if ($usuario instanceof Empleado) {
                 $list .= '<td>'
                         . '<form action="?c=consultas&a=action" method="post" id="formAction">'
                         . '<input type="hidden" name="js" class="js" value="0">'
-                        . '<input type="hidden" name="idConsulta" class="idConsulta" value="' . $row['consulta'] . '">'
+                        . '<input type="hidden" name="idConsulta" class="idConsulta" value="' . $data[$i][0]->getId() . '">'
                         . '<input type="submit" name="btnMod" class="btn btn-primary btnMod fa fa-input" value="&#xf044">'
                         . '<input type="submit" name="btnDel" class="btn btn-danger btnDel fa fa-input" value="&#xf2ed">'
                         . '</form>'

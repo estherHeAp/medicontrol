@@ -13,12 +13,12 @@ function selectEspecialidades($usuario, $empleado) {
     $select = '<label for="especialidadSelect">Especialidad * :</label>'
             . '<select name="especialidadSelect" class="especialidadSelect form-control" required>'
             . '<option value=""></option>';
-    while ($row = $data->fetch()) {
-        $select .= '<option value="' . $row['nombre'] . '"';
-        if ($row['nombre'] == $empleado) {
+    for($i = 0; $i < sizeof($data); $i++) {
+        $select .= '<option value="' . $data[$i]->getNombre() . '"';
+        if ($data[$i]->getNombre() == $empleado) {
             $select .= ' selected';
         }
-        $select .= '>' . $row['nombre'] . '</option>';
+        $select .= '>' . $data[$i]->getNombre() . '</option>';
     }
     $select .= '</select>';
 

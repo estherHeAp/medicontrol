@@ -13,12 +13,12 @@ function selectEmpleados($usuario, $empleado) {
     $select = '<label for="empleadoSelect">Empleado:</label>'
             . '<select name="empleadoSelect" class="empleadoSelect form-control">'
             . '<option value=""></option>';
-    while ($row = $data->fetch()) {
-        $select .= '<option value="' . $row['dni'] . '"';
-        if ($row['dni'] == $empleado) {
+    for($i = 0; $i < sizeof($data); $i++) {
+        $select .= '<option value="' . $data[$i]->getDni() . '"';
+        if ($data[$i]->getDni() == $empleado) {
             $select .= ' selected';
         }
-        $select .= '>' . $row['nombre'] . ' ' . $row['apellido1'] . ' ' . $row['apellido2'] . '</option>';
+        $select .= '>' . $data[$i]->getNombre() . ' ' . $data[$i]->getApellido1() . ' ' . $data[$i]->getApellido2() . '</option>';
     }
     $select .= '</select>';
 
