@@ -123,29 +123,4 @@ class DB {
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Obtenemos el email del usuario administrador
-     * 
-     * @return string - Email del usuario administrador
-     */
-    public static function getAdminEmail() {
-        $pdo = self::getConnection();
-
-        try {
-            $sql = 'select email from usuarios where dni = "admin";';
-            $param = [];
-
-            $stmt = self::getQueryStmt($sql, $param);
-            $email = $stmt->fetch();
-
-            return $email;
-        } catch (Exception $ex) {
-            echo 'ERROR - LA CONSULTA NO HA PODIDO SER REALIZADA: <br/>' . $ex->getMessage();
-        } finally {
-            unset($pdo);
-        }
-    }
-
 }

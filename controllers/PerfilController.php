@@ -148,7 +148,7 @@ class PerfilController {
             // Comprobamos que la contraseña introducida es la actual
             $cuenta = $usuario->getAccount();
 
-            if ($cuenta->getPass() === $pass) {
+            if (password_verify($pass, $cuenta->getPass())) {
                 // Comprobamos si el usuario tiene consultas asociadas
                 // No se puede eliminar un cliente con consultas asociadas
                 $consultas = $usuario->getConsultas(null);

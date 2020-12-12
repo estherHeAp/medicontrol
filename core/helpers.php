@@ -56,16 +56,14 @@ function newPass() {
  * @return boolean - Envío existoso (true) o no (false)
  */
 function sendMail($pass, $email) {
-    $admin = DB::getAdminEmail();
-
     $titulo = 'MediControl - Nueva contraseña';
     $mensaje = 'De acuerdo a su petici&oacute;n, se le ha asignado una nueva contrase&ntilde;a para acceder a su cuenta en MediControl: ' . $pass;
 
-    $header = "MIME-Version: 1.0\n";
-    $header .= "Content-type: text/html; charset=iso-8859-1\n";
-    $header .= "From: kennotamashi@gmail.com\n";
-    $header .= "Return-path: kennotamashi@gmail.com\n";
-    $header .= "X-Mailer: PHP/" . phpversion() . "\n";
+    $header = "MIME-Version: 1.0\r\n";
+    $header .= "Content-type: text/html; charset=iso-8859-1\r\n";
+    $header .= "From: kennotamashi@gmail.com\r\n";
+    $header .= "Return-path: kennotamashi@gmail.com\r\n";
+    $header .= "X-Mailer: PHP/" . phpversion() . "\r\n";
 
     return mail($email, $titulo, $mensaje, $header);
 }

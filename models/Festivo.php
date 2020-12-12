@@ -90,9 +90,11 @@ class Festivo extends Calendario {
      * @return boolean - Actualización con éxito (true) o no (false)
      */
     public static function updateYear() {
-        $data = self::get(null);
+        $data = self::getFestivos(null);
 
         if ($data) {
+            $stmt = null;
+            
             while ($row = $data->fetch()) {
                 // Extraemos la fecha y la actualizamos con el año actual
                 $fecha = date('Y') . '-' . date('m', strtotime($row['dia'])) . '-' . date('d', strtotime($row['dia']));
